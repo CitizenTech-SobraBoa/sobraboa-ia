@@ -178,5 +178,4 @@ Este projeto utiliza o modelo Gemini 3.5 Flash-Lite da Google como componente ce
 
 ## 🔗 Repositórios do Projeto
 
-- **API Java:** [sobraboa-api-java](https://github.com/[org]/sobraboa-api-java)
-- **IA:** este repositório
+- **API Java:** [sobraboa-api-java](https://github.com/CitizenTech-SobraBoa/sobraboa-api-java)
