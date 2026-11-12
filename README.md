@@ -95,6 +95,21 @@ Doador tira foto do alimento
 
 ---
 
+## 🚀 API em Produção
+
+| | |
+|---|---|
+| **URL base** | https://sobraboa-ia.onrender.com |
+| **Plataforma** | Render (free tier) |
+| **Runtime** | Docker · Python 3.11 |
+
+Endpoints disponíveis:
+- `POST /analisar-alimento` — analisa imagem e retorna JSON estruturado
+- `POST /chat` — chat contextual sobre o alimento já analisado
+- `GET /` — health check
+
+---
+
 ## Estrutura do Repositório
 
 ```
