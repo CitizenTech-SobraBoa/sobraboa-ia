@@ -7,7 +7,9 @@ import os
 import requests
 from io import BytesIO
 from PIL import Image
-import google.generativeai as genai
+
+from google import genai
+from google.genai import types
 
 app = FastAPI(
     title="SobraBoa IA API",
@@ -22,8 +24,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-GEMINI_API_KEY = os.environ["GEMINI_API_KEY"]
-genai.configure(api_key=GEMINI_API_KEY)
+cliente = genai.Client(api_key=os.environ["GEMINI_API_KEY"])
 MODELO = "gemini-3.5-flash-lite"
 
 SYSTEM_PROMPT = """
@@ -53,25 +54,15 @@ REGRAS DE AVALIAÇÃO:
 
 FORMATO DE RESPOSTA (sempre retorne JSON válido):
 {
-  "proprio_para_doacao": true ou false,
+  "aprovado": true ou false,
   "categoria": "uma das categorias acima",
-  "requer_refrigeracao": true ou false,
+  "alerta_cadeia_fria": true ou false,
   "validade_estimada": "ex: 1 dia, 3 dias, 1 semana",
   "cuidados_transporte": "orientação resumida",
   "observacoes": "informações adicionais relevantes",
-  "motivo_recusa": "preencher apenas se proprio_para_doacao for false"
+  "motivo_recusa": "preencher apenas se aprovado for false"
 }
 """
-
-modelo_analise = genai.GenerativeModel(
-    model_name=MODELO,
-    system_instruction=SYSTEM_PROMPT
-)
-
-modelo_chat = genai.GenerativeModel(
-    model_name=MODELO,
-    system_instruction=SYSTEM_PROMPT
-)
 
 
 # ---- modelos de dados ----
@@ -124,17 +115,15 @@ def analisar_alimento(req: AnalisarRequest):
         prompt += f"\n\nInformação adicional do doador: {req.descricao_extra}"
 
     try:
-        resposta = modelo_analise.generate_content([prompt, imagem])
-        texto = resposta.text.strip()
-
-        # remove blocos de markdown se o modelo os incluir
-        if texto.startswith("```"):
-            texto = texto.split("```")[1]
-            if texto.startswith("json"):
-                texto = texto[4:]
-
-        resultado = json.loads(texto)
-        return resultado
+        resposta = cliente.models.generate_content(
+            model=MODELO,
+            contents=[imagem, prompt],
+            config=types.GenerateContentConfig(
+                system_instruction=SYSTEM_PROMPT,
+                response_mime_type="application/json",
+            ),
+        )
+        return json.loads(resposta.text)
 
     except json.JSONDecodeError:
         raise HTTPException(status_code=500, detail="A IA retornou uma resposta em formato inválido.")
@@ -152,10 +141,35 @@ def chat(req: ChatRequest):
     if req.contexto_analise:
         contexto = f"\n\nContexto da análise anterior:\n{json.dumps(req.contexto_analise, ensure_ascii=False, indent=2)}\n\n"
 
+    historico_sdk = []
+    for msg in req.historico:
+        historico_sdk.append(
+            types.Content(
+                role=msg["role"],
+                parts=[types.Part(text=msg["text"])]
+            )
+        )
+
     prompt_completo = f"{contexto}Pergunta do doador: {req.mensagem}"
 
     try:
-        resposta = modelo_chat.generate_content(prompt_completo)
+        if historico_sdk:
+            chat_session = cliente.chats.create(
+                model=MODELO,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                ),
+                history=historico_sdk,
+            )
+            resposta = chat_session.send_message(prompt_completo)
+        else:
+            resposta = cliente.models.generate_content(
+                model=MODELO,
+                contents=prompt_completo,
+                config=types.GenerateContentConfig(
+                    system_instruction=SYSTEM_PROMPT,
+                ),
+            )
         return {"resposta": resposta.text.strip()}
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erro no chat: {str(e)}")
