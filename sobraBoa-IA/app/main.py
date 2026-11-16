@@ -2,6 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional
+from datetime import date
 import json
 import os
 import requests
@@ -151,13 +152,14 @@ def chat(req: ChatRequest):
         )
 
     prompt_completo = f"{contexto}Pergunta do doador: {req.mensagem}"
+    system_hoje = f"{SYSTEM_PROMPT}\n\nData de hoje: {date.today().strftime('%d/%m/%Y')}."
 
     try:
         if historico_sdk:
             chat_session = cliente.chats.create(
                 model=MODELO,
                 config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
+                    system_instruction=system_hoje,
                 ),
                 history=historico_sdk,
             )
@@ -167,7 +169,7 @@ def chat(req: ChatRequest):
                 model=MODELO,
                 contents=prompt_completo,
                 config=types.GenerateContentConfig(
-                    system_instruction=SYSTEM_PROMPT,
+                    system_instruction=system_hoje,
                 ),
             )
         return {"resposta": resposta.text.strip()}
