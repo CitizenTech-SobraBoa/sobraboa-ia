@@ -194,3 +194,13 @@ Este projeto utiliza o modelo Gemini 3.5 Flash-Lite da Google como componente ce
 
 - **App Mobile:** [SobraBoa_Mobile](https://github.com/CitizenTech-SobraBoa/SobraBoa_Mobile)
 - **API Java:** [sobraboa-api-java](https://github.com/CitizenTech-SobraBoa/sobraboa-api-java)
+
+---
+
+## Informações Acadêmicas
+
+- **Instituição:** FIAP
+- **Curso:** Análise e Desenvolvimento de Sistemas
+- **Semestre:** 3º — 2026
+- **Disciplina:** Disruptive Architectures: IA, IoT e Cognição
+- **Entrega:** Global Solution 2026/2
