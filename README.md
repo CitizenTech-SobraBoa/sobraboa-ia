@@ -63,11 +63,11 @@ Doador tira foto do alimento
 │                   App Mobile (React Native)          │
 │              [tela de publicar doação]               │
 └─────────────────────┬───────────────────────────────┘
-                      │  imagem (base64) + descrição
+                      │  imagem (URL) + descrição
                       ▼
 ┌─────────────────────────────────────────────────────┐
-│              sobraboa-api-java (Spring Boot)         │
-│         POST /api/ia/analisar-alimento               │
+│          sobraboa-ia (FastAPI · Python · Render)     │
+│         POST /analisar-alimento  |  POST /chat       │
 └─────────────────────┬───────────────────────────────┘
                       │
                       ▼
@@ -95,7 +95,7 @@ Doador tira foto do alimento
 
 ---
 
-## 🚀 API em Produção
+## API em Produção
 
 | | |
 |---|---|
@@ -179,7 +179,6 @@ O JSON da análise vira o contexto do chat, então o doador não precisa descrev
 ## Limitações
 
 - A IA não substitui a inspeção sanitária presencial
-- A análise depende da qualidade da foto (iluminação, ângulo)
 - Validade estimada é uma orientação — o doador é responsável pela informação real
 - A plataforma não certifica a qualidade do alimento (conforme RN09 do SobraBoa)
 
@@ -187,10 +186,11 @@ O JSON da análise vira o contexto do chat, então o doador não precisa descrev
 
 ## Declaração de Uso de IA
 
-Este projeto utiliza o modelo Gemini 3.5 Flash-Lite da Google como componente central da funcionalidade de triagem. O código foi desenvolvido pela equipe com apoio de ferramentas de IA generativa para revisão e sugestões. Todo o código foi compreendido e validado pelos integrantes do grupo.
+Este projeto utiliza o modelo Gemini 3.5 Flash-Lite da Google como componente central da funcionalidade de triagem. O código foi desenvolvido pela equipe com apoio de ferramentas de IA generativa para revisão e sugestões.
 
 ---
 
-## 🔗 Repositórios do Projeto
+## Repositórios do Projeto
 
+- **App Mobile:** [SobraBoa_Mobile](https://github.com/CitizenTech-SobraBoa/SobraBoa_Mobile)
 - **API Java:** [sobraboa-api-java](https://github.com/CitizenTech-SobraBoa/sobraboa-api-java)
